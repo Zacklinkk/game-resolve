@@ -53,7 +53,7 @@ You must strictly follow the "Turn Guidance" provided in the user message.
     "publicSupport": -5,      // Impact on popularity.
     "militaryLoyalty": 0,     // Impact on army control. CRITICAL: < 10 causes Coup.
     "securityLevel": -10,     // Impact on physical safety. CRITICAL: < 5 causes Capture/Death.
-    "panic": +5               // Impact on mental stability. CRITICAL: > 95 causes Breakdown.
+    "panic": 5                 // Impact on mental stability. CRITICAL: > 95 causes Breakdown.
   },
   "isGameOver": boolean,
   "endingType": "victory" | "death" | "prison" | "exile" | null,
@@ -69,7 +69,7 @@ You must strictly follow the "Turn Guidance" provided in the user message.
           "publicSupport": 0, 
           "militaryLoyalty": -5, 
           "securityLevel": 0, 
-          "panic": +10 
+          "panic": 10 
         },
         "isGameOver": false,
         "endingType": null
