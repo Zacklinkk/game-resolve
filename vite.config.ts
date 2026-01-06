@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
-      base: '/game-resolve/',
+      base: process.env.VITE_DEPLOY_TARGET === 'cloudflare' ? '/' : '/game-resolve/',
       server: {
         port: 3000,
         host: '0.0.0.0',
