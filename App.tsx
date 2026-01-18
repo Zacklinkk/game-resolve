@@ -39,6 +39,8 @@ const App: React.FC = () => {
     language: 'zh'
   });
 
+  const [previousStats, setPreviousStats] = useState(INITIAL_STATS);
+
   const [hasStarted, setHasStarted] = useState(false);
   const [currentConfig, setCurrentConfig] = useState<AIConfig | null>(null);
   
@@ -135,6 +137,9 @@ const App: React.FC = () => {
       securityLevel: Math.max(0, Math.min(100, gameState.stats.securityLevel + (currentStatsDelta.securityLevel || 0))),
       panic: Math.max(0, Math.min(100, gameState.stats.panic + (currentStatsDelta.panic || 0))),
     };
+
+    // 保存当前状态为 previousStats
+    setPreviousStats(gameState.stats);
 
     setGameState(prev => ({
       ...prev,
@@ -300,9 +305,10 @@ const App: React.FC = () => {
   return (
     <>
       {gameState.currentTurnData && (
-        <GameUI 
-          turnData={gameState.currentTurnData} 
+        <GameUI
+          turnData={gameState.currentTurnData}
           stats={gameState.stats}
+          previousStats={previousStats}
           turnNumber={gameState.turnNumber}
           onOptionSelect={handleOptionSelect}
           language={gameState.language}

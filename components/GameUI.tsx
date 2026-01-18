@@ -7,6 +7,7 @@ import { Clock, MapPin, Activity, Terminal } from 'lucide-react';
 interface Props {
   turnData: TurnData;
   stats: PlayerStats;
+  previousStats?: PlayerStats;
   onOptionSelect: (optionId: string, text: string) => void;
   turnNumber: number;
   language: Language;
@@ -41,7 +42,7 @@ const RISK_MAP_EN: Record<string, string> = {
   extreme: "EXTREME"
 };
 
-export const GameUI: React.FC<Props> = ({ turnData, stats, onOptionSelect, turnNumber, language, allowCustomInput = false }) => {
+export const GameUI: React.FC<Props> = ({ turnData, stats, previousStats = stats, onOptionSelect, turnNumber, language, allowCustomInput = false }) => {
   const [typingComplete, setTypingComplete] = useState(false);
   const [customInput, setCustomInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -146,10 +147,10 @@ export const GameUI: React.FC<Props> = ({ turnData, stats, onOptionSelect, turnN
                 <Activity size={14} className={isPanicHigh ? 'text-red-500 animate-bounce' : ''} /> {LABELS.sitrep}
               </h3>
               <div className="grid grid-cols-2 gap-2 md:flex md:flex-col md:space-y-4">
-                <StatBar label={LABELS.stats.support} value={stats.publicSupport} icon="users" color="bg-blue-600" />
-                <StatBar label={LABELS.stats.loyalty} value={stats.militaryLoyalty} icon="crosshair" color="bg-green-600" />
-                <StatBar label={LABELS.stats.security} value={stats.securityLevel} icon="shield" color="bg-stone-400" />
-                <StatBar label={LABELS.stats.panic} value={stats.panic} icon="alert" color={isPanicHigh ? "bg-red-500 animate-pulse" : "bg-red-900"} />
+                <StatBar label={LABELS.stats.support} value={stats.publicSupport} previousValue={previousStats.publicSupport} icon="users" color="bg-blue-600" />
+                <StatBar label={LABELS.stats.loyalty} value={stats.militaryLoyalty} previousValue={previousStats.militaryLoyalty} icon="crosshair" color="bg-green-600" />
+                <StatBar label={LABELS.stats.security} value={stats.securityLevel} previousValue={previousStats.securityLevel} icon="shield" color="bg-stone-400" />
+                <StatBar label={LABELS.stats.panic} value={stats.panic} previousValue={previousStats.panic} icon="alert" color={isPanicHigh ? "bg-red-500 animate-pulse" : "bg-red-900"} />
               </div>
            </div>
 
