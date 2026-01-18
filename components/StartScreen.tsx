@@ -12,7 +12,7 @@ export const StartScreen: React.FC<Props> = ({ onStart }) => {
   const [endpointId, setEndpointId] = useState(''); 
   const [modelId, setModelId] = useState('Qwen/Qwen2.5-72B-Instruct');
   const [rememberKeys, setRememberKeys] = useState(true);
-  const [language, setLanguage] = useState<Language>('zh');
+  const [language, setLanguage] = useState<Language>('en');
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
   const modelDropdownRef = useRef<HTMLDivElement>(null);
 

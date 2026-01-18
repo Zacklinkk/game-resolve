@@ -1,0 +1,13 @@
+{
+  "name": "Venezuela: Resolve",
+  "url": "https://zacklinkk.itch.io/venezuela-resolve",
+  "description": "A hyper-realistic geopolitical horror text adventure game",
+  "type": "html",
+  "launch_path": "index.html",
+  "targets": [
+    {
+      "name": "web",
+      "path": "."
+    }
+  ]
+}
