@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AlertOctagon, ExternalLink, Cpu, HardDrive, Server, Globe, ChevronDown } from 'lucide-react';
+import { AlertOctagon, ExternalLink, Cpu, HardDrive, Server, Globe, ChevronDown, Volume2, VolumeX } from 'lucide-react';
 import { AIProvider, AIConfig, Language } from '../types';
+import { audioManager } from '../services/audioManager';
 
 interface Props {
   onStart: (config: AIConfig) => void;
@@ -14,6 +15,7 @@ export const StartScreen: React.FC<Props> = ({ onStart }) => {
   const [rememberKeys, setRememberKeys] = useState(true);
   const [language, setLanguage] = useState<Language>('en');
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const modelDropdownRef = useRef<HTMLDivElement>(null);
 
   const modelOptions = [
@@ -31,6 +33,47 @@ export const StartScreen: React.FC<Props> = ({ onStart }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Initialize menu music on mount - play on ANY interaction
+  useEffect(() => {
+    let audioElement: HTMLAudioElement | null = null;
+    let hasPlayed = false;
+
+    const startMusic = () => {
+      if (hasPlayed || audioElement) return;
+      hasPlayed = true;
+
+      audioElement = new Audio('/audio/menu_music.mp3');
+      audioElement.loop = true;
+      audioElement.volume = 0.4;
+
+      // Add to DOM to keep it alive
+      document.body.appendChild(audioElement);
+
+      audioElement.play().then(() => {
+        console.log('Menu music playing automatically');
+      }).catch(error => {
+        console.warn('Audio play failed:', error);
+      });
+    };
+
+    // Listen for ANY user interaction
+    const events = ['click', 'keydown', 'touchstart', 'mousedown'];
+    events.forEach(event => {
+      document.addEventListener(event, startMusic, { once: true, capture: true });
+    });
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, startMusic, { capture: true });
+      });
+      if (audioElement && audioElement.parentNode) {
+        audioElement.pause();
+        audioElement.parentNode.removeChild(audioElement);
+        audioElement = null;
+      }
     };
   }, []);
 
@@ -81,6 +124,17 @@ export const StartScreen: React.FC<Props> = ({ onStart }) => {
     const newLang = language === 'zh' ? 'en' : 'zh';
     setLanguage(newLang);
     localStorage.setItem('game_language', newLang);
+  };
+
+  const toggleMute = () => {
+    if (isMuted) {
+      audioManager.setVolume(0.4);
+      audioManager.resume();
+    } else {
+      audioManager.setVolume(0);
+      audioManager.pause();
+    }
+    setIsMuted(!isMuted);
   };
 
   const handleStart = () => {
@@ -152,21 +206,37 @@ export const StartScreen: React.FC<Props> = ({ onStart }) => {
   return (
     <div className="min-h-[100dvh] w-full flex items-center justify-center bg-stone-950 text-stone-300 relative overflow-y-auto p-4 custom-scrollbar">
       <div className="absolute inset-0 z-0 fixed">
-        <img src="https://picsum.photos/seed/war/1920/1080" className="w-full h-full object-cover painting-filter opacity-30 grayscale" alt="Background" />
-        <div className="absolute inset-0 bg-black/70"></div>
-        {/* Animated grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(255,0,0,0.02),rgba(255,0,0,0.06))] bg-[length:100%_4px,3px_100%] pointer-events-none"></div>
+        <img src="/images/caracas_war_background.png" className="w-full h-full object-cover opacity-60" alt="War Background" onError={(e) => {
+          // Fallback to original placeholder if image fails
+          (e.target as HTMLImageElement).src = "https://picsum.photos/seed/war/1920/1080";
+        }} />
+        {/* 轻微的暗化遮罩，让背景可见 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
+        {/* 网格遮罩 - 增强军事风格 */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(255,0,0,0.01),rgba(255,0,0,0.03))] bg-[length:100%_4px,3px_100%] pointer-events-none"></div>
       </div>
 
       <div className="z-10 max-w-2xl w-full bg-stone-900/90 border border-stone-700 p-6 md:p-8 shadow-[0_0_50px_rgba(0,0,0,0.9)] backdrop-blur-sm relative my-4">
-        
-        {/* Language Toggle */}
-        <button 
-          onClick={toggleLanguage}
-          className="absolute top-3 right-3 md:top-4 md:right-4 flex items-center gap-2 text-xs font-tech text-stone-500 hover:text-amber-500 border border-stone-700 px-2 py-1 bg-black/50 z-20"
-        >
-          <Globe size={12} /> {language === 'zh' ? "CN / EN" : "EN / CN"}
-        </button>
+
+        {/* Top Controls */}
+        <div className="flex justify-between items-center mb-4">
+          {/* Language Toggle */}
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center gap-2 text-xs font-tech text-stone-500 hover:text-amber-500 border border-stone-700 px-2 py-1 bg-black/50 z-20"
+          >
+            <Globe size={12} /> {language === 'zh' ? "CN / EN" : "EN / CN"}
+          </button>
+
+          {/* Mute Toggle */}
+          <button
+            onClick={toggleMute}
+            className="flex items-center gap-2 text-xs font-tech text-stone-500 hover:text-amber-500 border border-stone-700 px-2 py-1 bg-black/50 z-20"
+            title={isMuted ? "Unmute" : "Mute"}
+          >
+            {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+          </button>
+        </div>
 
         <div className="text-center mb-4 md:mb-6 border-b border-stone-700 pb-4 md:pb-6 mt-2 md:mt-0">
           <h1 className="font-title text-3xl md:text-5xl text-amber-600 mb-2 drop-shadow-lg tracking-tight glitch-text" data-text={T.title}>{T.title}</h1>

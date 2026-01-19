@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RefreshCw, ExternalLink } from 'lucide-react';
 import { TurnData, AIProvider } from '../types';
+import { audioManager } from '../services/audioManager';
 
 interface Props {
   data: TurnData;
@@ -10,9 +11,21 @@ interface Props {
 
 export const EndingScreen: React.FC<Props> = ({ data, turnCount, provider }) => {
   const isVictory = data.endingType === 'victory';
-  
+
   // Detect language based on first char of narrative (crude but effective for display)
   const isEn = /[a-zA-Z]/.test(data.narrative.slice(0, 5));
+
+  // Play ending music
+  useEffect(() => {
+    // Fade out current music and play ending music
+    audioManager.fadeOut(1000).then(() => {
+      audioManager.play('ending');
+    });
+
+    return () => {
+      audioManager.stop();
+    };
+  }, []);
 
   const TITLES_ZH: Record<string, string> = {
     victory: "胜利：主权捍卫者",
@@ -33,7 +46,20 @@ export const EndingScreen: React.FC<Props> = ({ data, turnCount, provider }) => 
 
   return (
     <div className="min-h-[100dvh] w-full flex items-center justify-center bg-black text-stone-200 relative z-50 overflow-y-auto p-4">
-      <div className="max-w-3xl text-center p-6 md:p-8 border-y-2 border-stone-800 bg-stone-950/90 backdrop-blur-xl">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src={isVictory ? "/images/victory_ending.png" : "/images/abstract_chaos.png"}
+          className="w-full h-full object-cover opacity-20 grayscale"
+          alt="Ending Background"
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/95"></div>
+      </div>
+
+      <div className="max-w-3xl text-center p-6 md:p-8 border-y-2 border-stone-800 bg-stone-950/90 backdrop-blur-xl relative z-10">
         <h2 className={`font-title text-2xl md:text-5xl mb-4 ${isVictory ? 'text-green-600' : 'text-red-700'}`}>
           {title}
         </h2>

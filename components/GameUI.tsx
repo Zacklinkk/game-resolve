@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TurnData, PlayerStats, Language } from '../types';
 import { TypewriterText } from './TypewriterText';
 import { StatBar } from './StatBar';
-import { Clock, MapPin, Activity, Terminal } from 'lucide-react';
+import { Clock, MapPin, Activity, Terminal, Volume2, VolumeX } from 'lucide-react';
+import { audioManager } from '../services/audioManager';
 
 interface Props {
   turnData: TurnData;
@@ -45,8 +46,39 @@ const RISK_MAP_EN: Record<string, string> = {
 export const GameUI: React.FC<Props> = ({ turnData, stats, previousStats = stats, onOptionSelect, turnNumber, language, allowCustomInput = false }) => {
   const [typingComplete, setTypingComplete] = useState(false);
   const [customInput, setCustomInput] = useState("");
+  const [isMuted, setIsMuted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isEn = language === 'en';
+
+  // Initialize game music on mount
+  useEffect(() => {
+    // Start gameplay music if not already playing
+    if (!audioManager.isPlayingNow()) {
+      audioManager.play('gameplay');
+    } else if (audioManager.getCurrentTrack() === 'menu') {
+      // Fade from menu to gameplay music
+      audioManager.fadeOut(500).then(() => {
+        audioManager.fadeIn('gameplay', 1000);
+      });
+    }
+
+    return () => {
+      // Keep music playing during game
+    };
+  }, []);
+
+  // Change music based on panic level
+  useEffect(() => {
+    if (stats.panic > 70 && audioManager.getCurrentTrack() !== 'tension') {
+      audioManager.fadeOut(500).then(() => {
+        audioManager.fadeIn('tension', 1000);
+      });
+    } else if (stats.panic <= 70 && audioManager.getCurrentTrack() === 'tension') {
+      audioManager.fadeOut(500).then(() => {
+        audioManager.fadeIn('gameplay', 1000);
+      });
+    }
+  }, [stats.panic]);
 
   useEffect(() => {
     setTypingComplete(false);
@@ -86,6 +118,17 @@ export const GameUI: React.FC<Props> = ({ turnData, stats, previousStats = stats
     onOptionSelect("custom_action", customInput.trim());
   };
 
+  const toggleMute = () => {
+    if (isMuted) {
+      audioManager.setVolume(0.4);
+      audioManager.resume();
+    } else {
+      audioManager.setVolume(0);
+      audioManager.pause();
+    }
+    setIsMuted(!isMuted);
+  };
+
   const isPanicHigh = stats.panic > 70;
   const isPanicCritical = stats.panic > 90;
   
@@ -97,18 +140,39 @@ export const GameUI: React.FC<Props> = ({ turnData, stats, previousStats = stats
 
   return (
     <div className={`h-[100dvh] w-full flex flex-col relative overflow-hidden bg-stone-950 transition-all duration-1000 ${panicOverlayClass}`}>
-      
-      <div className="absolute inset-0 z-0 opacity-20 transition-opacity duration-1000">
-         <div 
-            className={`w-full h-full bg-gradient-to-br from-stone-900 via-stone-800 to-stone-950 ${isPanicHigh ? 'from-red-950 via-stone-900' : ''}`}
-            style={{
-              backgroundImage: `
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 3px),
-                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.1) 3px)
-              `
-            }}
-         />
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/images/command_center.png"
+          className="w-full h-full object-cover opacity-50"
+          alt="Command Center Background"
+          onError={(e) => {
+            // Fallback to gradient if image fails
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+        {/* 轻微暗化，让背景可见 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-950/70 via-stone-900/60 to-black/80"></div>
+        {/* 网格遮罩 - 保持军事风格 */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 3px),
+              repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.1) 3px)
+            `
+          }}
+        />
       </div>
+
+      {/* Audio Control */}
+      <button
+        onClick={toggleMute}
+        className="absolute top-4 right-4 z-50 flex items-center gap-2 text-xs font-tech text-stone-500 hover:text-amber-500 border border-stone-700 px-2 py-1 bg-black/50"
+        title={isMuted ? "Unmute" : "Mute"}
+      >
+        {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+      </button>
 
       <div className="z-10 bg-red-900/80 text-white text-sm py-1 font-tech overflow-hidden border-b border-red-700 flex items-center shadow-[0_0_15px_rgba(220,38,38,0.5)] flex-shrink-0">
         <div className="px-2 font-bold bg-red-800 h-full flex items-center z-20 whitespace-nowrap glitch-text" data-text={LABELS.news}>{LABELS.news}</div>
