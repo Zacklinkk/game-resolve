@@ -49,7 +49,7 @@ export const EndingScreen: React.FC<Props> = ({ data, turnCount, provider }) => 
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src={isVictory ? "/images/victory_ending.png" : "/images/abstract_chaos.png"}
+          src={isVictory ? `${(window as any).__BASE_PATH__ || ''}images/victory_ending.png` : `${(window as any).__BASE_PATH__ || ''}images/abstract_chaos.png`}
           className="w-full h-full object-cover opacity-20 grayscale"
           alt="Ending Background"
           onError={(e) => {

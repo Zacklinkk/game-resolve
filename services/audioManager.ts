@@ -11,13 +11,22 @@ class AudioManager {
   private isPlaying: boolean = false;
   private volume: number = 0.4;
 
-  // Music track URLs
-  private tracks: Record<MusicTrack, string> = {
-    menu: '/audio/menu_music.mp3',
-    gameplay: '/audio/01-dark-military-industrial.mp3',
-    tension: '/audio/02-shadow-protocol.mp3',
-    ending: '/audio/01-dark-military-industrial.mp3'
-  };
+  // Get the base path for assets
+  private getBasePath(): string {
+    return (window as any).__BASE_PATH__ || '/';
+  }
+
+  // Get track URL dynamically
+  private getTrackUrl(track: MusicTrack): string {
+    const basePath = this.getBasePath();
+    const trackFiles: Record<MusicTrack, string> = {
+      menu: 'audio/menu_music.mp3',
+      gameplay: 'audio/01-dark-military-industrial.mp3',
+      tension: 'audio/02-shadow-protocol.mp3',
+      ending: 'audio/01-dark-military-industrial.mp3'
+    };
+    return basePath + trackFiles[track];
+  }
 
   /**
    * Play a music track
@@ -34,7 +43,7 @@ class AudioManager {
     }
 
     try {
-      this.audio = new Audio(this.tracks[track]);
+      this.audio = new Audio(this.getTrackUrl(track));
       this.audio.loop = loop;
       this.audio.volume = this.volume;
 

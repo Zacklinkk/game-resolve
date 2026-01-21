@@ -206,12 +206,12 @@ export const StartScreen: React.FC<Props> = ({ onStart }) => {
   return (
     <div className="min-h-[100dvh] w-full flex items-center justify-center bg-stone-950 text-stone-300 relative overflow-y-auto p-4 custom-scrollbar">
       <div className="absolute inset-0 z-0 fixed">
-        <img src="/images/caracas_war_background.png" className="w-full h-full object-cover opacity-60" alt="War Background" onError={(e) => {
+        <img src={`${(window as any).__BASE_PATH__ || ''}images/caracas_war_background.png`} className="w-full h-full object-cover opacity-60" alt="War Background" onError={(e) => {
           // Fallback to original placeholder if image fails
           (e.target as HTMLImageElement).src = "https://picsum.photos/seed/war/1920/1080";
         }} />
         {/* 轻微的暗化遮罩，让背景可见 */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30"></div>
         {/* 网格遮罩 - 增强军事风格 */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(255,0,0,0.01),rgba(255,0,0,0.03))] bg-[length:100%_4px,3px_100%] pointer-events-none"></div>
       </div>

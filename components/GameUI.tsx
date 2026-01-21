@@ -143,7 +143,7 @@ export const GameUI: React.FC<Props> = ({ turnData, stats, previousStats = stats
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/images/command_center.png"
+          src={`${(window as any).__BASE_PATH__ || ''}images/command_center.png`}
           className="w-full h-full object-cover opacity-50"
           alt="Command Center Background"
           onError={(e) => {
@@ -152,7 +152,7 @@ export const GameUI: React.FC<Props> = ({ turnData, stats, previousStats = stats
           }}
         />
         {/* 轻微暗化，让背景可见 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-stone-950/70 via-stone-900/60 to-black/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-950/30 via-stone-900/20 to-black/40"></div>
         {/* 网格遮罩 - 保持军事风格 */}
         <div
           className="absolute inset-0 opacity-10"
