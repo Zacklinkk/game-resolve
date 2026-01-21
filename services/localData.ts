@@ -102,8 +102,8 @@ const RAW_EVENTS = [
         risk: "medium",
         nextEventId: "evt_4",
         outcome: {
-          narrative: "在摄像头前，将军们一个个走上台签字。但这更像是一场表演。你看到了他们眼中的恐惧，而不是忠诚。恐惧是把双刃剑。",
-          statsDelta: { militaryLoyalty: 10, personalSecurity: -5 }
+          narrative: "在摄像头前，将军们一个个走上台签字。但这更像是一场表演。你看到了他们眼中的恐惧，而不是忠诚。恐惧是把双刃剑——表面服从，内心怨恨。",
+          statsDelta: { militaryLoyalty: 5, personalSecurity: -10 }
         }
       },
       {
@@ -158,8 +158,8 @@ const RAW_EVENTS = [
         risk: "extreme",
         nextEventId: "evt_5",
         outcome: {
-          narrative: "魔鬼的交易。帮派同意为你做一些'脏活'，打击反对派。但这进一步坐实了美国对你'毒品国家'的指控。",
-          statsDelta: { personalSecurity: 10, internationalStance: -20 }
+          narrative: "魔鬼的交易。帮派同意为你做一些'脏活'，打击反对派。但这进一步坐实了美国对你'毒品国家'的指控。你得到了短期的保护，但出卖了灵魂。",
+          statsDelta: { personalSecurity: -5, internationalStance: -30 }
         }
       },
       {
@@ -237,8 +237,8 @@ const RAW_EVENTS = [
         risk: "high",
         nextEventId: "evt_8",
         outcome: {
-          narrative: "坦克履带碾过尘土。这是一场昂贵的展示。卫星照片显示，你的坦克大多年久失修，半数趴窝。美国人看清了你的虚实。",
-          statsDelta: { militaryLoyalty: 5, internationalStance: -10 }
+          narrative: "坦克履带碾过尘土。这是一场昂贵的展示。卫星照片显示，你的坦克大多年久失修，半数趴窝。美国人看清了你的虚实。士兵们也意识到装备的落后，士气受挫。",
+          statsDelta: { militaryLoyalty: -5, internationalStance: -15 }
         }
       },
       {
@@ -282,8 +282,8 @@ const RAW_EVENTS = [
         risk: "medium",
         nextEventId: "evt_10",
         outcome: {
-          narrative: "军车驶上街头。宵禁暂时压制了抢劫，但也让城市变得像一座巨大的监狱。民众的怒火在黑暗中积聚。",
-          statsDelta: { publicSupport: -15, personalSecurity: 5 }
+          narrative: "军车驶上街头。宵禁暂时压制了抢劫，但也让城市变得像一座巨大的监狱。民众的怒火在黑暗中积聚。长期来看，这激化了矛盾，增加了动荡风险。",
+          statsDelta: { publicSupport: -15, personalSecurity: -5 }
         }
       },
       {
@@ -383,8 +383,8 @@ const RAW_EVENTS = [
         risk: "high",
         nextEventId: "evt_13",
         outcome: {
-          narrative: "一场清洗风暴席卷了情报机构。效率下降了，人人自危。你可能抓住了几个同谋，但更多的人因为恐惧而动了叛逃的念头。",
-          statsDelta: { personalSecurity: 10, militaryLoyalty: -15 }
+          narrative: "一场清洗风暴席卷了情报机构。效率下降了，人人自危。你可能抓住了几个同谋，但更多的人因为恐惧而动了叛逃的念头。这种做法创造了新的敌人。",
+          statsDelta: { personalSecurity: -5, militaryLoyalty: -15 }
         }
       },
       {
@@ -473,8 +473,8 @@ const RAW_EVENTS = [
         risk: "low",
         nextEventId: "evt_13",
         outcome: {
-          narrative: "化整为零。这能防止被一次性斩首，但也意味着你失去了对军队的直接控制权。军阀化的风险在增加。",
-          statsDelta: { militaryLoyalty: -10, personalSecurity: 15 }
+          narrative: "化整为零。这能防止被一次性斩首，但也意味着你失去了对军队的直接控制权。军阀化的风险在增加。短期更安全，长期更危险。",
+          statsDelta: { militaryLoyalty: -10, personalSecurity: 5 }
         }
       },
       {
@@ -8026,6 +8026,28 @@ const RAW_EVENTS = [
     options: []
   },
 
+  // END_GAME
+  {
+    id: "END_GAME",
+    phase: "ENDING",
+    narrative: "游戏结束。\n所有的路都走到了尽头。无论是生是死，是胜是负，历史都会记住这个名字：尼古拉斯·马杜罗。",
+    newsTicker: "GAME OVER: 游戏结束。",
+    location: "The End",
+    time: "Epilogue",
+    options: []
+  },
+
+  // END_TRUE_SURVIVOR
+  {
+    id: "END_TRUE_SURVIVOR",
+    phase: "ENDING",
+    narrative: "结局达成：真正幸存者 (THE TRUE SURVIVOR)。\n你不仅活了下来，你还赢了。几年后，你奇迹般地重返权力。这简直是好莱坞都不敢拍的剧本。这是真正的委内瑞拉：resolve。游戏结束？不，游戏才刚刚开始。",
+    newsTicker: "IMPOSSIBLE VICTORY: 马杜罗重返权力巅峰。",
+    location: "Presidential Palace",
+    time: "2030",
+    options: []
+  },
+
   // Event 190: Secret Ending (Easter Egg)
   {
     id: "evt_190",
@@ -8076,10 +8098,10 @@ export const LOCAL_EVENT_LIBRARY: LocalEventTemplate[] = RAW_EVENTS.map(event =>
       outcome: {
         narrative: opt.outcome.narrative,
         statsDelta: {
-          publicSupport: opt.outcome.statsDelta.publicSupport || 0,
+          publicSupport: (opt.outcome.statsDelta.publicSupport || 0) + Math.floor((opt.outcome.statsDelta.internationalStance || 0) * 0.3),
           militaryLoyalty: opt.outcome.statsDelta.militaryLoyalty || 0,
-          securityLevel: opt.outcome.statsDelta.personalSecurity || 0,
-          panic: 0
+          securityLevel: (opt.outcome.statsDelta.personalSecurity || 0) + Math.floor((opt.outcome.statsDelta.internationalStance || 0) * 0.2),
+          panic: opt.outcome.statsDelta.panic || 0
         }
       }
     }))
