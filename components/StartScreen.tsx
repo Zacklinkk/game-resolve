@@ -45,7 +45,8 @@ export const StartScreen: React.FC<Props> = ({ onStart }) => {
       if (hasPlayed || audioElement) return;
       hasPlayed = true;
 
-      audioElement = new Audio('/audio/menu_music.mp3');
+      const basePath = (window as any).__BASE_PATH__ || '/';
+      audioElement = new Audio(basePath + 'audio/menu_music.mp3');
       audioElement.loop = true;
       audioElement.volume = 0.4;
 
