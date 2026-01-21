@@ -10,7 +10,8 @@
     "build:github": "cross-env VITE_DEPLOY_TARGET=github vite build",
     "build:itchio": "vite build --base=./",
     "preview": "vite preview",
-    "deploy": "npm run build:github && npx gh-pages -d dist"
+    "deploy": "npm run build:github && npx gh-pages -d dist",
+    "deploy:cloudflare": "npm run build:github && wrangler pages deploy dist --project-name=game-resolve"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",
@@ -26,6 +27,7 @@
     "gh-pages": "^6.3.0",
     "playwright": "^1.57.0",
     "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "wrangler": "^4.59.3"
   }
 }
